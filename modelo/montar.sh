@@ -23,6 +23,11 @@ subprocess.run(args, check=True)
 print("estilo", tl["estilo"], "tema", tl["tema"], "duracao", tl["dur"])
 PY
 python3 "$M/capa.py" "$PROD" "$M/clipes/surpresa.mp4" "${OUT%.mp4}_capa.jpg" >/dev/null
+# capa como primeiro meio segundo do video (o TikTok de conta pessoal usa o 1o quadro como capa)
+mv "$OUT" "$TMP/corpo.mp4"
+ffmpeg -v error -y -loop 1 -framerate 30 -t 0.5 -i "${OUT%.mp4}_capa.jpg" -f lavfi -t 0.5 -i anullsrc=r=44100:cl=stereo -i "$TMP/corpo.mp4" \
+  -filter_complex "[0:v]scale=1080:1920,format=yuv420p,setsar=1[cv];[2:v]setsar=1[bv];[cv][1:a][bv][2:a]concat=n=2:v=1:a=1[v][a]" \
+  -map "[v]" -map "[a]" -c:v libx264 -preset veryfast -crf 19 -pix_fmt yuv420p -r 30 -c:a aac -b:a 192k -movflags +faststart "$OUT"
 D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$OUT")
 ffmpeg -v error -y -i "$OUT" -vf "fps=6/$D,scale=270:480,tile=6x1" -frames:v 1 "${OUT%.mp4}_conferir.jpg"
 rm -rf "$TMP"; echo "pronto: $OUT"

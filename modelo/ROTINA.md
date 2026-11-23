@@ -36,7 +36,7 @@ Rodar, a partir da raiz do repositório de vídeos:
 ```
 bash modelo/montar.sh <pasta_do_produto> videos/HOJE/<n>-<id>.mp4
 ```
-O script também gera a capa `<n>-<id>_capa.jpg` (mantenha-a no repositório). Depois, abra o `_conferir.jpg` e a `_capa.jpg` geradas e confira se nenhum texto saiu cortado ou por cima de algo. Se saiu, encurte o texto e monte de novo. Apague os `_conferir.jpg` antes de salvar.
+O script também gera a capa `<n>-<id>_capa.jpg` (mantenha-a no repositório) e já coloca essa capa no primeiro meio segundo do vídeo, porque a conta do TikTok é pessoal e usa o 1º quadro como capa. Depois, abra o `_conferir.jpg` e a `_capa.jpg` geradas e confira se nenhum texto saiu cortado ou por cima de algo. Se saiu, encurte o texto e monte de novo. Apague os `_conferir.jpg` antes de salvar.
 
 ## 4. Publicar o vídeo
 - Salve os mp4 em `videos/HOJE/`, faça commit e push na branch `main`.
