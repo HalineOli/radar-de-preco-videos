@@ -34,7 +34,7 @@ Rodar, a partir da raiz do repositório de vídeos:
 ```
 bash modelo/montar.sh <pasta_do_produto> videos/HOJE/<n>-<id>.mp4
 ```
-Depois, abra o `_conferir.jpg` gerado e confira se nenhum texto saiu cortado ou por cima de algo. Se saiu, encurte o texto e monte de novo. Apague os `_conferir.jpg` antes de salvar.
+O script também gera a capa `<n>-<id>_capa.jpg` (mantenha-a no repositório). Depois, abra o `_conferir.jpg` e a `_capa.jpg` geradas e confira se nenhum texto saiu cortado ou por cima de algo. Se saiu, encurte o texto e monte de novo. Apague os `_conferir.jpg` antes de salvar.
 
 ## 4. Publicar o vídeo
 - Salve os mp4 em `videos/HOJE/`, faça commit e push na branch `main`.
@@ -44,6 +44,7 @@ Depois, abra o `_conferir.jpg` gerado e confira se nenhum texto saiu cortado ou 
 ## 5. Agendar no Metricool
 Marca (blogId): `8258136`. Ferramenta: createScheduledPost, uma por vídeo, `draft: false`, `autoPublish: true`.
 - `providers`: `[{"network":"tiktok"}]`
+- `videoThumbnailUrl`: URL pública da capa (`.../videos/HOJE/<n>-<id>_capa.jpg`). Se o Metricool recusar por causa da capa, agende de novo sem `videoThumbnailUrl` e avise a dona.
 - `tiktokData`: `{"title": "<até 90 caracteres>", "privacyOption":"PUBLIC_TO_EVERYONE", "commercialContentThirdParty": true, "commercialContentOwnBrand": false, "isAigc": true, "disableComment": false, "disableDuet": false, "disableStitch": false, "autoAddMusic": false}` (o title é obrigatório)
 - `text` (legenda), modelo:
   `<Produto> de R$ X por R$ Y 😱 <1 frase com 1-2 características reais> e nota <nota> de quem já comprou. Link na bio 🔗 ou comenta QUERO que a gente te manda! Preço consultado em <dd/mm>, pode mudar.`
