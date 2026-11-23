@@ -16,19 +16,21 @@ Objetivo: todo dia, transformar os 5 produtos que o robô Ofertou exporta em 5 v
 - Horário que já passou quando a rotina rodar: pule esse post.
 
 ## 3. Montar cada vídeo
-Para cada produto, crie uma pasta de trabalho com `1-foto.jpg`, `4-avaliacao.jpg` e um `info.json`:
+Para cada produto, crie uma pasta de trabalho com `1-foto.jpg` e um `info.json`:
 ```json
 {"de":129.90,"por":99.90,"pct":23,"vendas":605,"nota":4.9,"data":"22/11",
  "hook":["LIQUIDIFICADOR PHILCO 1200W","POR MENOS DE R$ 100"],
  "chips":["1200W","3 LITROS","12 VELOCIDADES"],
- "porlbl":"POR APENAS"}
+ "porlbl":"POR APENAS", "n":4, "data_iso":"2026-11-22"}
 ```
 Regras do texto (verdade sempre, nada inventado):
 - `hook`: 2 linhas em MAIÚSCULAS, no máximo ~28 caracteres cada. Linha 1 = o que é o produto (curto). Linha 2 = o gancho de preço, que precisa ser verdadeiro ("POR MENOS DE R$ 100" só se for menos de 100; senão "POR SÓ R$ 54,90").
 - Se `a_partir_de` for true: `porlbl` = "A PARTIR DE" e o gancho também diz "A PARTIR DE".
 - `chips`: 3 características curtas tiradas do NOME do produto (ex.: "KIT 5 POTES", "VIDRO", "COM TAMPA"). Nunca invente características.
 - Proibido escrever "oferta relâmpago", "últimas unidades", contagem regressiva ou qualquer urgência que o robô não informou.
-- `data`: dia/mês de hoje.
+- `data`: dia/mês de hoje. `data_iso`: HOJE. `n`: posição do vídeo no dia (1 = o das 18h, 2 = 10h, 3 = 12h, 4 = 20h, 5 = 16h).
+- O estilo visual (A a E: cores, ordem das cenas, clipes da personagem, música e capa) é escolhido sozinho pelo `n` + data, então os 5 vídeos do dia saem sempre diferentes entre si e mudam de um dia para o outro. Não force o mesmo estilo.
+- Os gatilhos ("APROVEITE AGORA", "PREÇO PODE SUBIR A QUALQUER MOMENTO", "LINK NA BIO", "COMENTA QUERO" etc.) já estão no modelo; não acrescente outros.
 
 Rodar, a partir da raiz do repositório de vídeos:
 ```
