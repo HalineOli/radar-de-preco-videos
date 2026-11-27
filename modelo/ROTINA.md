@@ -15,7 +15,7 @@ Objetivo: todo dia, olhar os produtos que o robô Ofertou exporta, escolher SÓ 
 - Abra `publicados.csv` (colunas: `data,horario,id,produto,preco,status`). `status` = `agendado`, `publicado` ou `erro`.
 - Atualize os status antigos: chame getScheduledPosts (brandId 8258136, do dia 1º do mês até hoje, fuso America/Sao_Paulo). Post que aparece com status ERROR → `erro` (e anote o motivo para avisar a dona). Post com data já passada que não aparece mais como pendente/erro → `publicado`.
 - `USADOS` = linhas do mês atual com status `agendado` ou `publicado` (as de `erro` não contam). Linhas com id `limite-metricool` contam como 20 de uma vez (o mês já esgotou).
-- `META` = arredondar para cima (20 × dia_de_hoje ÷ dias_do_mês). Ex.: dia 15 de um mês de 30 dias → META 10.
+- `META` = arredondar para cima (20 × dias de seg a sex do mês até hoje, contando hoje ÷ total de dias de seg a sex do mês). Ex.: 10º dia útil de um mês com 21 dias úteis → META 10. (A cota é pensada para os dias úteis, que têm mais visualização.)
 - Se `USADOS` ≥ 20: não monte vídeo, não agende nada e pare sem avisar (a cota do mês acabou; volta no dia 1º).
 - Se algum post deu ERROR com "account limit" e o mês ainda não tinha 20 no registro, acrescente uma linha `limite-metricool` no mês, avise a dona e pare.
 
@@ -31,13 +31,21 @@ Classifique o melhor do dia:
 - **Forte**: desconto ≥ 40%; ou preço ≤ R$ 30 com desconto ≥ 25%; ou ≥ 1.000 vendas, nota ≥ 4,7 e desconto ≥ 30%.
 - **Fraco**: o resto.
 
+## 3b. Dia e hora que mais dão visualização (prioridade)
+Os posts vão para os dias e horários com mais audiência. Nenhuma regra de escolha pode colocar um post fora deles, a não ser o produto excepcional no fim de semana.
+- **Dias**: segunda a sexta são os dias prioritários. Quarta e quinta são os melhores. Sábado e domingo têm cerca de metade da audiência: só posta no fim de semana se o produto for **excepcional**.
+- **Horário**: a cada rodada, chame getBestTimeToPostByNetwork (brandId 8258136, rede tiktok, de hoje 00:00 a hoje 23:59, fuso America/Sao_Paulo). Use o dia da semana de hoje e escolha a hora com maior valor entre 9h e 21h. Isso costuma dar 10h, 12h ou 18h. Se houver 2º post, ele vai na 2ª melhor hora que esteja a pelo menos 4 horas de distância da 1ª.
+- **Dados do próprio perfil**: chame getAnalyticsDataByMetrics (brandId 8258136, métricas TKPO02 = data/hora em UTC, some -3h para Brasília, e TKPO07 = visualizações) para os últimos 60 dias. Quando houver pelo menos 20 vídeos com dados, calcule a média de visualizações por dia da semana e por faixa de horário. Se algum dia ou horário tiver média pelo menos 30% acima dos outros, dê prioridade a ele no lugar do que o Metricool sugere (e conte isso para a dona na próxima mensagem).
+
 Quantos postar hoje:
-- Melhor do dia **fraco** → não posta hoje.
-- Melhor do dia **forte** → posta 1, só se `USADOS` < `META`.
-- Melhor do dia **excepcional** → posta 1 mesmo que `USADOS` ≥ `META`, desde que `USADOS` < `META` + 2 e `USADOS` < 20. Se houver um 2º produto também excepcional e ainda sobrar cota dentro dessas mesmas regras, pode postar 2.
+- Sábado ou domingo → só posta se o melhor do dia for **excepcional** e `USADOS` < `META` + 1.
+- Segunda a sexta:
+  - Melhor do dia **fraco** → não posta hoje.
+  - Melhor do dia **forte** → posta 1, só se `USADOS` < `META`. Em quarta e quinta, posta também se `USADOS` = `META` (são os melhores dias).
+  - Melhor do dia **excepcional** → posta 1 mesmo que `USADOS` ≥ `META`, desde que `USADOS` < `META` + 2. Se houver um 2º produto também excepcional e ainda sobrar cota dentro dessa regra, pode postar 2.
 - Nunca mais de 2 por dia e nunca passar de 20 no mês.
 
-Horários: o 1º escolhido → 18:00; o 2º (se houver) → 12:00. Se o horário já passou quando a rotina rodar, pule esse post.
+Horários: o 1º escolhido vai na melhor hora do dia (veja 3b); o 2º, se houver, na 2ª melhor. Se o horário já passou quando a rotina rodar, pule esse post.
 
 ## 4. Montar cada vídeo
 Monte vídeo SÓ dos produtos escolhidos. Para cada um, crie uma pasta de trabalho com `1-foto.jpg` e um `info.json`:
@@ -52,7 +60,7 @@ Regras do texto (verdade sempre, nada inventado):
 - Se `a_partir_de` for true: `porlbl` = "A PARTIR DE" e o gancho também diz "A PARTIR DE".
 - `chips`: 3 características curtas tiradas do NOME do produto (ex.: "KIT 5 POTES", "VIDRO", "COM TAMPA"). Nunca invente características.
 - Proibido escrever "oferta relâmpago", "últimas unidades", contagem regressiva ou qualquer urgência que o robô não informou.
-- `data`: dia/mês de hoje. `data_iso`: HOJE. `n`: posição do vídeo no dia (1 = o das 18h, 2 = o das 12h).
+- `data`: dia/mês de hoje. `data_iso`: HOJE. `n`: posição do vídeo no dia (1 = o 1º escolhido, 2 = o 2º).
 - O estilo visual (A a E: cores, ordem das cenas, clipes da personagem, música e capa) é escolhido sozinho pelo `n` + data, então os vídeos mudam de um dia para o outro. Não force o mesmo estilo.
 - Os gatilhos ("APROVEITE AGORA", "PREÇO PODE SUBIR A QUALQUER MOMENTO", "LINK NA BIO", "COMENTA QUERO" etc.) já estão no modelo; não acrescente outros.
 
